@@ -2,18 +2,19 @@
 
 This C header library provides a set of macros that can be used to manage resources and handle errors in C code.
 
-## Getting Started
+## Documentation
 
 To use this library, you will need to include the header file in your C code. The following macros are available:
 
 -   `scope { ... }`: This macro creates four variables that are used to store information about destructors and error handling. It should be used to define the beginning of a scope in which resources can be managed.
--   `defer(variable, { value }, destructor)`: This macro allows you to specify a code block to be run as a destructor when the scope is exited. It takes three arguments: "name", "value", and "destructor". The "name" argument is the name of the variable that will be assigned the "value" argument. The "destructor" argument is a code block that will be run as a destructor when the scope is exited.
+-   `defer(variable, { value }, destructor)`: This macro allows you to specify a code block to be run as a destructor when the scope is exited. It takes three arguments: `name`, `value`, and `destructor`. The `name` argument is the name of the variable that will be assigned the "value" argument. The `destructor` argument is a code block that will be run as a destructor when the scope is exited.
 -   `defer_exit { ... }`: This macro is used to run all of the destructors that were specified using the "defer" macro within the current scope. It should be used at the end of a scope to ensure that all resources are properly cleaned up.
 -   `defer_error { ... }`: This macro defines a label that can be jumped to if an error occurs within the current scope.
     To use these macros in your code, you can follow the example below:
 
-```c
+## Usage Example
 
+```c
 struct bignum {
   int *data;
 };
@@ -21,12 +22,19 @@ struct bignum {
 int main(int argc, char *argv[]) {
   scope {
     struct bignum defer(googol, {.data = malloc(sizeof(int) * 10)},
-                        printf("free googol number %d\n", *number.data); free(googol.data));
+                        printf("free googol number %d\n", *googol.data); free(googol.data));
     struct bignum defer(pi, {.data = malloc(sizeof(int) * 10)},
-                        free(pi.data););
-    number.data[0] = 10;
+                        printf("free pi number %d\n", *pi.data); free(pi.data););
+    googol.data[0] = 10;
+    pi.data[0] = 3;
   }
   defer_exit { return 0; }
   defer_error { return 1; }
 }
 ```
+
+The `defer` macro is used to declare and assign two variables called `googol` and `pi` of type `bignum`. Variables are assigned values with a dynamically allocated array of integers and the `destructor` for this variable prints out the value of the first element in the array and frees the memory.
+
+At the end of the main function, the `defer_exit` macro is used to run the destructors for the `googol` and `pi` variables and then `return 0`. If `defer_error_no` is set, it will jump to the `defer_error_code` label and return 1.
+
+Overall, this code uses the `scope` and `defer` macros to manage resources and handle errors within the main function. The `googol` and `pi` variables are dynamically allocated and their memory is properly freed using the destructors specified in the `defer` macros. If an error occurs within the scope of the main function, the program will `return 1`.
