@@ -21,7 +21,7 @@ struct bignum {
 
 int main(int argc, char *argv[]) {
   scope {
-    /* Allocate resource and and defer for freeing */
+    /* Allocate resource and defer for freeing */
     struct bignum defer(googol, {.data = malloc(sizeof(int) * 10)},
                         printf("free googol number %d\n", *googol.data); free(googol.data));
     struct bignum defer(pi, {.data = malloc(sizeof(int) * 10)},
