@@ -35,6 +35,6 @@ int main(int argc, char *argv[]) {
 
 The `defer` macro is used to declare and assign two variables called `googol` and `pi` of type `bignum`. Variables are assigned values with a dynamically allocated array of integers and the `destructor` for this variable prints out the value of the first element in the array and frees the memory.
 
-At the end of the main function, the `defer_exit` macro is used to run the destructors for the `googol` and `pi` variables and then `return 0`. If `defer_error_no` is set, it will jump to the `defer_error_code` label and return 1.
+At the end of the main function, the `defer_exit` macro is used to run the destructors for the `googol` and `pi` variables and then `return 0`. If `defer_error_no` is set, it will jump to the `defer_error_code` label and `return 1`.
 
 Overall, this code uses the `scope` and `defer` macros to manage resources and handle errors within the main function. The `googol` and `pi` variables are dynamically allocated and their memory is properly freed using the destructors specified in the `defer` macros. If an error occurs within the scope of the main function, the program will `return 1`.
