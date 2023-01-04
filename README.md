@@ -2,6 +2,8 @@
 
 This C header library provides a set of macros that can be used to manage resources and handle errors in C code.
 
+It could be really helpful for avoiding the pain of forgetting to free resources.
+
 ## Documentation
 
 To use this library, you will need to include the header file in your C code. The following macros are available:
