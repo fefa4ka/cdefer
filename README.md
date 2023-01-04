@@ -47,3 +47,16 @@ The `defer` macro is used to declare and assign two variables called `googol` an
 At the end of the main function, the `defer_exit` macro is used to run the destructors for the `googol` and `pi` variables and then `return 0`. If `defer_error_no` is set, it will jump to the `defer_error_code` label and `return 1`.
 
 Overall, this code uses the `scope` and `defer` macros to manage resources and handle errors within the main function. The `googol` and `pi` variables are dynamically allocated and their memory is properly freed using the destructors specified in the `defer` macros. If an error occurs within the scope of the main function, the program will `return 1`.
+
+## Contributions
+
+We welcome any contributions to the "C Defer" library! If you have ideas for new features or improvements, please don't hesitate to open an issue or pull request.
+
+Here are a few ideas for ways to enrich the library:
+
+-   [Nested scopes](https://github.com/fefa4ka/cdefer/issues/1): It would be really useful to add support for nested scopes in the "C Defer" library. This would allow for more complex resource management and error handling in C code.
+-   Improved error handling: Currently, the "C Defer" library provides a basic error handling mechanism through the `defer_error` and `defer_error_no` variables. Adding additional features, such as the ability to throw and catch specific error codes or clear error flags, would enhance the error handling capabilities of the library.
+-   More powerful destructors: It might be helpful to allow destructors to take arguments or to have more control over the execution of destructors, such as the ability to specify the order in which they are run.
+-   Portability: Making the "C Defer" library more portable across different C compilers could make it more widely used and useful to more developers.
+
+Overall, we are open to any ideas for improving the "C Defer" library and making it a more powerful and useful tool for C programmers. If you have any ideas or suggestions, please don't hesitate to contribute!
