@@ -60,3 +60,9 @@ Here are a few ideas for ways to enrich the library:
 -   Portability: Making the "C Defer" library more portable across different C compilers could make it more widely used and useful to more developers.
 
 Overall, we are open to any ideas for improving the "C Defer" library and making it a more powerful and useful tool for C programmers. If you have any ideas or suggestions, please don't hesitate to contribute!
+
+## License
+
+This library is currently unlicensed. This means that it is not restricted by any copyright or licensing terms and is free to use, modify, and distribute as desired. However, we encourage contributors to consider releasing their contributions under an open source license to allow others to use and build upon the library.
+
+We are open to any suggestions for an appropriate open source license for the "C Defer" library. Please feel free to open an issue or pull request to discuss potential licensing options.
