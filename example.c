@@ -43,9 +43,8 @@ int main(int argc, char *argv[])
     printf("=== C Defer Example ===\n\n");
 
     // Create a scope where deferred operations will be registered
-    scope
-    {
-        printf("Entering scope and allocating resources...\n");
+    scope {
+        printf("Entering outer scope and allocating resources...\n");
 
         // Example 1: Allocate and automatically free memory for a bignum
         struct bignum defer(googol,
@@ -59,17 +58,31 @@ int main(int argc, char *argv[])
                                 free(googol.name);
                             });
 
-        // Example 2: Another bignum with different values
-        struct bignum defer(pi,
-                            _({.data = malloc(sizeof(int) * 5),
-                               .size = 5,
-                               .name = strdup("pi")}),
-                            {
-                                printf("Cleaning up %s with value %d\n",
-                                       pi.name, *pi.data);
-                                free(pi.data);
-                                free(pi.name);
-                            });
+        // Nested scope example
+        scope {
+            printf("\nEntering nested scope...\n");
+            
+            // Example 2: Another bignum with different values in nested scope
+            struct bignum defer(pi,
+                                _({.data = malloc(sizeof(int) * 5),
+                                   .size = 5,
+                                   .name = strdup("pi")}),
+                                {
+                                    printf("Cleaning up %s with value %d\n",
+                                           pi.name, *pi.data);
+                                    free(pi.data);
+                                    free(pi.name);
+                                });
+                                
+            // Use the nested scope resource
+            init_bignum(&pi, 314);
+            
+            // We can access outer scope resources from inner scope
+            init_bignum(&googol, 10000000);
+            
+            printf("Leaving nested scope - nested resources will be cleaned up first\n");
+            scope_end;
+        }
 
         // Example 3: File handling with automatic closing
         struct file_resource defer(
@@ -83,18 +96,14 @@ int main(int argc, char *argv[])
                 free(log_file.filename);
             });
 
-        // Use the resources
-        init_bignum(&googol, 10000000);
-        init_bignum(&pi, 314);
-
         if (log_file.handle) {
-            fprintf(log_file.handle, "Logged values: googol=%d, pi=%d\n",
-                    *googol.data, *pi.data);
+            fprintf(log_file.handle, "Logged values: googol=%d\n",
+                    *googol.data);
             printf("Wrote to log file: %s\n", log_file.filename);
         }
 
-        printf(
-            "\nLeaving scope - resources will be automatically cleaned up\n");
+        printf("\nLeaving outer scope - remaining resources will be cleaned up\n");
+        scope_end;
     }
 
     // All destructors are run when exiting the scope

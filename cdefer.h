@@ -1,34 +1,48 @@
 #pragma once
 
 #define MAX_STACK_SIZE 100
+#define MAX_SCOPE_DEPTH 10
 
 #define scope                                                                  \
-  void *destructors[MAX_STACK_SIZE];                                           \
-  unsigned int destructor_index = 0;                                           \
-  unsigned int defer_error_no = 0;                                             \
-  unsigned int defer_runtime = 0;
+  static void *_destructors[MAX_STACK_SIZE];                                   \
+  static unsigned int _destructor_index = 0;                                   \
+  static unsigned int _defer_error_no = 0;                                     \
+  static unsigned int _defer_runtime = 0;                                      \
+  static unsigned int _scope_stack[MAX_SCOPE_DEPTH] = {0};                     \
+  static unsigned int _scope_depth = 0;                                        \
+  _scope_stack[_scope_depth++] = _destructor_index;                            \
+  for(int _scope_once = 1; _scope_once; _scope_once = 0)
+
+#define scope_end                                                              \
+  _defer_runtime = 1;                                                          \
+  while (_destructor_index > _scope_stack[_scope_depth-1]) {                   \
+    goto *_destructors[_destructor_index - 1];                                 \
+  defer_entry_freed_inner:                                                     \
+    _destructor_index -= 1;                                                    \
+  }                                                                            \
+  _scope_depth--;
 
 #define defer(name, value, destructor)                                         \
   name = value;                                                                \
-  if (defer_runtime) {                                                         \
+  if (_defer_runtime) {                                                        \
     destructor_##name : destructor;                                            \
-    goto defer_entry_freed;                                                    \
+    goto defer_entry_freed_inner;                                              \
   }                                                                            \
-  destructors[destructor_index] = &&destructor_##name;                         \
-  destructor_index += 1
+  _destructors[_destructor_index] = &&destructor_##name;                       \
+  _destructor_index += 1
 
 #define defer_exit                                                             \
-  defer_runtime = 1;                                                           \
-  while (destructor_index > 0) {                                               \
-    goto *destructors[destructor_index - 1];                                   \
+  _defer_runtime = 1;                                                          \
+  while (_destructor_index > 0) {                                              \
+    goto *_destructors[_destructor_index - 1];                                 \
   defer_entry_freed:                                                           \
-    destructor_index -= 1;                                                     \
+    _destructor_index -= 1;                                                    \
   }                                                                            \
-  if (defer_error_no)                                                          \
+  if (_defer_error_no)                                                         \
     goto defer_error_code;
 
 #define defer_error                                                            \
   defer_error_code:                                                            \
-  if (defer_error_no)
+  if (_defer_error_no)
 
 #define _(...) __VA_ARGS__

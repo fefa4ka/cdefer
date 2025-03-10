@@ -18,6 +18,7 @@ This library provides macros that help manage resources by automatically running
 | Macro | Description |
 |-------|-------------|
 | `scope { ... }` | Defines a scope where deferred operations can be registered |
+| `scope_end;` | Ends a scope and runs all destructors registered in that scope |
 | `defer(name, value, destructor)` | Declares a variable with cleanup code that runs when the scope exits |
 | `defer_exit { ... }` | Runs all registered destructors and executes the provided code |
 | `defer_error { ... }` | Handles error cases after destructors have run |
@@ -47,10 +48,30 @@ int main() {
                          free(googol.data);
                        });
     
+    // Nested scope example
+    scope {
+      // Resources in nested scopes
+      struct bignum defer(pi, 
+                         {.data = malloc(sizeof(int) * 5), 
+                          .size = 5, 
+                          .name = "pi"},
+                         {
+                           printf("Cleaning up %s\n", pi.name);
+                           free(pi.data);
+                         });
+      
+      // Use the allocated memory
+      pi.data[0] = 3;
+      
+      // When nested scope exits, its cleanup code runs automatically
+      scope_end;
+    }
+    
     // Use the allocated memory
     googol.data[0] = 10;
     
-    // When scope exits, cleanup code runs automatically
+    // When outer scope exits, its cleanup code runs automatically
+    scope_end;
   }
   
   defer_exit { return 0; }
