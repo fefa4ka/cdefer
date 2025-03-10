@@ -40,9 +40,9 @@ int main() {
   scope {
     // Allocate memory and register cleanup code
     struct bignum defer(googol, 
-                       {.data = malloc(sizeof(int) * 10), 
+                        _({.data = malloc(sizeof(int) * 10), 
                         .size = 10, 
-                        .name = "googol"},
+                        .name = "googol"}),
                        {
                          printf("Cleaning up %s\n", googol.name);
                          free(googol.data);
@@ -52,9 +52,9 @@ int main() {
     scope {
       // Resources in nested scopes
       struct bignum defer(pi, 
-                         {.data = malloc(sizeof(int) * 5), 
+                         _({.data = malloc(sizeof(int) * 5), 
                           .size = 5, 
-                          .name = "pi"},
+                          .name = "pi"}),
                          {
                            printf("Cleaning up %s\n", pi.name);
                            free(pi.data);
