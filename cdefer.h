@@ -17,8 +17,6 @@
   _defer_runtime = 1;                                                          \
   while (_destructor_index > _scope_stack[_scope_depth-1]) {                   \
     goto *_destructors[_destructor_index - 1];                                 \
-  defer_entry_freed_inner:                                                     \
-    _destructor_index -= 1;                                                    \
   }                                                                            \
   _scope_depth--;
 
@@ -26,7 +24,8 @@
   name = value;                                                                \
   if (_defer_runtime) {                                                        \
     destructor_##name : destructor;                                            \
-    goto defer_entry_freed_inner;                                              \
+    _destructor_index -= 1;                                                    \
+    continue;                                                                  \
   }                                                                            \
   _destructors[_destructor_index] = &&destructor_##name;                       \
   _destructor_index += 1
