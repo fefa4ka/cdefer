@@ -18,6 +18,7 @@
   destructor_index += 1
 
 #define defer_exit                                                             \
+  defer_runtime = 1;                                                           \
   while (destructor_index > 0) {                                               \
     goto *destructors[destructor_index - 1];                                   \
   defer_entry_freed:                                                           \
