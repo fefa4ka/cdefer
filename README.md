@@ -1,20 +1,25 @@
-# C Deffered Promise
+# C Defer
 
-This C header library provides a set of macros that can be used to manage resources and handle errors in C code.
+A C header library that provides resource management with defer semantics, similar to Go's defer statement.
 
-## Documentation
+## Overview
 
-To use this library, you will need to include the header file in your C code. The following macros are available:
+This library provides macros that help manage resources by automatically running cleanup code when a scope is exited.
 
--   `scope { ... }`: This macro creates four variables that are used to store information about destructors and error handling. It should be used to define the beginning of a scope in which resources can be managed.
--   `defer(variable, { value }, destructor)`: This macro allows you to specify a code block to be run as a destructor when the scope is exited. It takes three arguments: `name`, `value`, and `destructor`. The `name` argument is the name of the variable that will be assigned the "value" argument. The `destructor` argument is a code block that will be run as a destructor when the scope is exited.
--   `defer_exit { ... }`: This macro is used to run all of the destructors that were specified using the "defer" macro within the current scope. It should be used at the end of a scope to ensure that all resources are properly cleaned up.
--   `defer_error { ... }`: This macro defines a label that can be jumped to if an error occurs within the current scope.
-    To use these macros in your code, you can follow the example below:
+## Macros
 
-## Usage Example
+- `scope { ... }`: Defines a scope where deferred operations can be registered
+- `defer(name, value, destructor)`: Declares a variable with cleanup code that runs when the scope exits
+- `defer_exit { ... }`: Runs all registered destructors and executes the provided code
+- `defer_error { ... }`: Handles error cases after destructors have run
+
+## Example
 
 ```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <cdefer.h>
+
 struct bignum {
   int *data;
 };
@@ -33,8 +38,4 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-The `defer` macro is used to declare and assign two variables called `googol` and `pi` of type `bignum`. Variables are assigned values with a dynamically allocated array of integers and the `destructor` for this variable prints out the value of the first element in the array and frees the memory.
-
-At the end of the main function, the `defer_exit` macro is used to run the destructors for the `googol` and `pi` variables and then `return 0`. If `defer_error_no` is set, it will jump to the `defer_error_code` label and return 1.
-
-Overall, this code uses the `scope` and `defer` macros to manage resources and handle errors within the main function. The `googol` and `pi` variables are dynamically allocated and their memory is properly freed using the destructors specified in the `defer` macros. If an error occurs within the scope of the main function, the program will `return 1`.
+This example demonstrates automatic cleanup of allocated memory when the scope exits.
