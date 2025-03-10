@@ -30,3 +30,5 @@
 #define defer_error                                                            \
   defer_error_code:                                                            \
   if (defer_error_no)
+
+#define _(...) __VA_ARGS__
